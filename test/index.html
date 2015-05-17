@@ -7,8 +7,17 @@
     <body>
         <script src="bower_components/jasmine/lib/jasmine-core/jasmine.js"></script>
         <script src="bower_components/jasmine/lib/jasmine-core/jasmine-html.js"></script>
+        <script src="bower_components/jquery/dist/jquery.js"></script>
+        <!-- not using this because it seems to cause the jasmine matchers to go awry;
+        something to do with the version of jasmine-jquery not being compatible with the version of jquery or jasmine;
+        obviously this could be sorted out but going to procrastinate on that
+        <script src="bower_components/jasmine-jquery/lib/jasmine-jquery.js"></script>->
+        
 
         <!-- include source files here... -->
+        <script style="text/javascript" src="../scripts/swindowmodel.js"></script>
+        <script style="text/javascript" src="../scripts/swindowview.js"></script>
+        <script style="text/javascript" src="../scripts/hrh.js"></script>
 
         <!-- include spec files here... -->
         <script src="spec/test.js"></script>
