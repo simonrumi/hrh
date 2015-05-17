@@ -1,0 +1,56 @@
+/*colors*/
+@blueGrey: #C8C3FC;
+@purpleGrey: #DBC5FF;
+@vividPink: #FC5EC7;
+@vividPurple: #D354E0;
+@black: #2A2A40;
+
+/*fonts*/
+@cursive: 'Great Vibes', cursive;
+@serif: 'Sorts Mill Goudy', serif;
+@subHeadingSize: 16pt;
+
+/*spacing*/
+@fontRelativePadding: 0.25em;
+@contentWindowWidth: 50%;
+
+#menu {
+	
+}
+
+.menu-item {
+	font-family: @cursive;
+	font-size: @subHeadingSize;
+	display: inline;
+	color: @black;
+	background-color: @blueGrey;
+	padding: @fontRelativePadding;
+}
+
+.content-window {
+	position: absolute;
+	font-family: @serif;
+	width: @contentWindowWidth;
+	padding: @fontRelativePadding;
+}
+
+#content-item1 {
+	z-index: 1;
+	left: 20;
+	top: 20;
+	background-color: @purpleGrey;
+}
+
+#content-item2 {
+	z-index: 2;
+	left: 40;
+	top: 40;
+	background-color: @vividPink;
+}
+
+#content-item3 {
+	z-index: 3;
+	left: 60;
+	top: 60;
+	background-color: @vividPurple;
+}
