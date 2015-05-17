@@ -27,8 +27,7 @@ var SWindowController = (function() {
 		}
 	};
 	
-	// TODO this is basically the same as _makeModels ...how to DRY up?
-	var _makeViews = function (windownNames) {
+	var _makeViews = function (windownNames,controller) {
 		var i;
 		var windowName;
 		var windowView;
@@ -37,11 +36,12 @@ var SWindowController = (function() {
 			windowName = windowNames[i];
 			windowView = SWindowView(windowName);
 			_group.addView(windowName, windowView);
+			windowView.addListener(controller);
 		}
-	}
+	};
 	
 	return {
-		getWindowNames : function() {
+		getAllWindowNames : function() {
 			return _group.getAllWindowNames();
 		},
 		
@@ -55,16 +55,12 @@ var SWindowController = (function() {
 		
 		populateAllWindows : function(windowNames) {
 			_makeModels(windowNames);
-			_makeViews(windowNames);
+			_makeViews(windowNames, this);
 		},
 		
-		notify : function(view) {
-			updateModel(view.name)
-		},
-		
-		updateModel : function(name) {
-			var windowModel = _allSWindowModels[name];
-			windowModel.update(QQQQNeedToTellModelWhatToUpdate);
+		notify : function(view, updater) {
+			var model = this.getModelByName(view.name());
+			updater.update(model, view, this);
 		},
 	}
 })();
@@ -108,7 +104,7 @@ function SWindowGroup() {
 			} else {
 				_allWindows[name] = {'view': view};
 			}
-		}
+		},
 	}
 };
 
@@ -118,24 +114,33 @@ var windowNames = ['content-item1', 'content-item2', 'content-item3'];
 // QQQQQQQQQ mid way through making the SWindowGroup & SWindowController
 
 $(document).ready(function() {
-	var allWindowNames;
+	// var allWindowNames;
 	SWindowController.populateAllWindows(windowNames);
-	allWindowNames = SWindowController.getWindowNames();
+	// allWindowNames = SWindowController.getWindowNames();
+	//
+	// $('.content-window').click( function(event) {
+	// 	console.log('event.target id is ' + event.target.id); 
+	// 	var i;
+	// 	var model;
+	// 	var view;
+	//	
+	// 	for(i in allWindowNames) {
+	// 		model = SWindowController.getModelByName(allWindowNames[i]);
+	// 		view = SWindowController.getViewByName(allWindowNames[i]);
+	// 		if (model.name() === event.target.id) {
+	// 			$(view.divId()).css('z-index',3);
+	// 		} else {
+	// 			$(view.divId()).css('z-index',1);
+	// 		}
+	// 	}
+	// });
 	
 	$('.content-window').click( function(event) {
-		console.log('event.target id is ' + event.target.id); 
-		var i;
-		var model;
-		var view;
+		var currentView;
 		
-		for(i in allWindowNames) {
-			model = SWindowController.getModelByName(allWindowNames[i]);
-			view = SWindowController.getViewByName(allWindowNames[i]);
-			if (model.name() === event.target.id) {
-				$(view.divId()).css('z-index',3);
-			} else {
-				$(view.divId()).css('z-index',1);
-			}
-		}
+		console.log('event.target id is ' + event.target.id); 
+		currentView = SWindowController.getViewByName(event.target.id);
+		currentView.bringWindowToFront();
+		
 	});
 });

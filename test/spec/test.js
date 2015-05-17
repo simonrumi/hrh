@@ -18,19 +18,22 @@
     // example
     //var element = mock($);
     
-    var createHtmlFixture = function() {
-         setFixtures(
-            '<div id="menu">'
-            +'<div class="menu-item" id="menu-item1">item 1</div>'
-            +'<div class="menu-item" id="menu-item2">item 2</div>'
-            +'<div class="menu-item" id="menu-item3">item 3</div>'
+    var createTestFixture = function() {
+         $('body').append('<div id="testingElements">'
+            +'<div id="menu">'
+                +'<div class="menu-item" id="menu-item1">item 1</div>'
+                +'<div class="menu-item" id="menu-item2">item 2</div>'
+                +'<div class="menu-item" id="menu-item3">item 3</div>'
             +'</div>'
             +'<div class="content-window" id="content-item1">content for item 1</div>'
             +'<div class="content-window" id="content-item2">content for item 2</div>'
-            +'<div class="content-window" id="content-item3">content for item 3</div>');
+            +'<div class="content-window" id="content-item3">content for item 3</div>'
+            +'</div>');
     }
     
-    
+    var removeTestFixture = function() {
+        $('#testingElements').remove();
+    }
     
     describe('Testing SWindowModel', function() {
         var model = SWindowModel('testModel');
@@ -103,16 +106,19 @@
             var spyEvent;
             
             beforeEach(function() {
-                createHtmlFixture();
+                createTestFixture();
             });
         
             it('should invoke sWindowClick()', function() {
-                spyEvent = spyOnEvent('.content-window', 'click');
+                spyOn($('.content-window'), 'click');
                 $('#content-item2').trigger('click');
                 
-                expect('click').toHaveBeenTriggeredOn('#content-item2');
-                expect(spyEvent).toHaveBeenTriggered();
+                expect(sWindowClick()).toHaveBeenCalled();
             });
+            
+            afterEach(function() {
+                removeTestFixture();
+            })
         });
         
         
