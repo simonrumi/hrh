@@ -18,23 +18,6 @@
     // example
     //var element = mock($);
     
-    var createTestFixture = function() {
-         $('body').append('<div id="testingElements">'
-            +'<div id="menu">'
-                +'<div class="menu-item" id="menu-item1">item 1</div>'
-                +'<div class="menu-item" id="menu-item2">item 2</div>'
-                +'<div class="menu-item" id="menu-item3">item 3</div>'
-            +'</div>'
-            +'<div class="content-window" id="content-item1">content for item 1</div>'
-            +'<div class="content-window" id="content-item2">content for item 2</div>'
-            +'<div class="content-window" id="content-item3">content for item 3</div>'
-            +'</div>');
-    }
-    
-    var removeTestFixture = function() {
-        $('#testingElements').remove();
-    }
-    
     describe('Testing SWindowModel', function() {
         var model = SWindowModel('testModel');
         
@@ -49,93 +32,118 @@
     });
     
     describe('Testing SWindowView', function() {
-    	
-        var view = SWindowView('testWindow');
-    	
-    	var observerObj = {
-            isNotified : false, 
-    		notify : function (modelUpdater) {
-    			this.isNotified = true;
-    		}
-    	}
+        var testViewName = 'test-item1';
         
-        it('should set the default properties', function () {
-        	var i;
-        	var j;
-        	var propertyObj;
-        	
-        	expect(view.name()).toBe('testWindow');
-        	expect(view.divId()).toBe('#testWindow');
-            expect(view.observers()).toEqual(new Array());
-        	expect(view.updatableProperties()).toBeDefined();
-        	for (i in view.updatableProperties()) {
-        		propertyObj = view.updatableProperties[i];
-        		for (j in propertyObj) {
-        			expect(propertyObj[j]).toBeDefined();
-        		}
-        	}
-            expect(view.content()).toBeDefined();
-            expect(view.top()).toEqual(0);
-            expect(view.left()).toEqual(0);
-            expect(view.width()).toEqual('100%');
-            expect(view.height()).toEqual('100%');
-            expect(view.zIndex()).toEqual(1);
-        });
-        
-        it('should be able to register a listener', function () {
-        	view.addListener(observerObj);
-        	expect(view.observers().length).toEqual(1);
-        });
-        
-        it('should be able to notify a listener', function () {
-        	view.notifyListeners(contentUpdater);
-            expect(observerObj.isNotified).toBe(true);
-        });
-        
-        it('should be able to clear all listeners', function () {
-            view.clearListeners();
-            expect(view.observers.length).toEqual(0);
-        });
-        
-        it('should be able to set the z-index of an element', function () {
-            view.setZIndex(3);
-            expect(view.zIndex()).toEqual(3);
-        });
-        
-        describe('Testing SWindowView handling DOM events', function() {
-            var spyEvent;
+        describe('Testing basic properties', function() {  
+            var view;
             
             beforeEach(function() {
-                createTestFixture();
+                view = SWindowView(testViewName);
+            });
+            
+            it('should set the default properties', function () {
+                var i;
+                var j;
+                var propertyObj;
+                
+                expect(view.name()).toBe(testViewName);
+                expect(view.divId()).toBe('#' + testViewName);
+                expect(view.observers()).toEqual(new Array());
+                expect(view.updatableProperties()).toBeDefined();
+                for (i in view.updatableProperties()) {
+                    propertyObj = view.updatableProperties[i];
+                    for (j in propertyObj) {
+                        expect(propertyObj[j]).toBeDefined();
+                    }
+                }
+                expect(view.content()).toBeDefined();
+                expect(view.top()).toEqual(0);
+                expect(view.left()).toEqual(0);
+                expect(view.width()).toEqual('100%');
+                expect(view.height()).toEqual('100%');
+                expect(view.zIndex()).toEqual(1);
+            });
+            
+            it('should be able to set the z-index of an element', function () {
+                view.setZIndex(3);
+                expect(view.zIndex()).toEqual(3);
+            });
+        });
+        
+        describe('Testing listener', function() {  
+            var view = SWindowView(testViewName);
+            
+            var observerObj = {
+                isNotified : false, 
+                notify : function (modelUpdater) {
+                    this.isNotified = true;
+                }
+            }
+                
+            it('should be able to register a listener', function () {
+            	view.addListener(observerObj);
+            	expect(view.observers().length).toEqual(1);
+            });
+            
+            it('should be able to notify a listener', function () {
+            	view.notifyListeners(contentUpdater);
+                expect(observerObj.isNotified).toBe(true);
+            });
+            
+            it('should be able to clear all listeners', function () {
+                view.clearListeners();
+                expect(view.observers.length).toEqual(0);
+            });
+        });
+          
+        describe('Testing SWindowView handling DOM events', function() {            
+            var view;
+            
+            beforeEach(function() {
+                var testController;
+                var windowNames = [testViewName, 'test-item2', 'test-item3'];
+                createTestFixture(windowNames);
+                testController = createTestEnvironment(windowNames);
+                view = testController.getViewByName(testViewName);
+                
+                $('#' + testViewName).on('click', function(event) {
+                    //var currentView;
+                    console.log('event.target id is ' + event.target.id); 
+                    // view = testController.getViewByName(event.target.id);
+                    view.bringWindowToFront();
+                });
             });
         
-            it('should invoke sWindowClick()', function() {
-                spyOn($('.content-window'), 'click');
-                $('#content-item2').trigger('click');
+            it('should invoke bringWindowToFront()', function() {
+                spyOn(view, 'bringWindowToFront'); //.andCallThrough();
+                $('#' + testViewName).trigger('click');
                 
-                expect(sWindowClick()).toHaveBeenCalled();
+                expect(view.bringWindowToFront).toHaveBeenCalled();
             });
             
             afterEach(function() {
                 removeTestFixture();
-            })
+            });
         });
-        
-        
     });
 
     describe('Testing SWindowController', function() {
+        var testController;
+        
+        beforeEach(function() {
+            var windowNames = ['test-item1', 'test-item2', 'test-item3'];
+            createTestFixture(windowNames);
+            testController = createTestEnvironment(windowNames);
+        });
         
         it('should populate all windows', function() {
-            
-            var windowNames = ['test-item1', 'test-item2', 'test-item3'];
-            
-            SWindowController.populateAllWindows(windowNames);
-            var allWindowNames = SWindowController.getWindowNames();
-            
-            expect(SWindowController.getModelByName('test-item1')).toBeDefined();
-            expect(SWindowController.getModelByName('test-item2')).toBeDefined();
-            expect(SWindowController.getModelByName('test-item3')).toBeDefined();
+            expect(testController.getModelByName('test-item1')).toBeDefined();
+            expect(testController.getModelByName('test-item2')).toBeDefined();
+            expect(testController.getModelByName('test-item3')).toBeDefined();
+        });
+        
+        afterEach(function() {
+            removeTestFixture();
         });
     });
 })();
